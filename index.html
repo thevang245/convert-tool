@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tải Nhạc & Video Chất Lượng Cao</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #9d9d9d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .format-badge {
+            display: inline-block;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Thết lập Gradient mặc định ban đầu cho từng Badge */
+        #ytBadge { background: linear-gradient(135deg, #ff0000, #ff5252); }
+        #scBadge { background: linear-gradient(135deg, #ff5500, #ff8800); }
+        #twBadge { background: linear-gradient(135deg, #0f1419, #272c30); }
+
+        .tab-container {
+            display: flex;
+            background: #e4e7e6;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 5px;
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        /* --- MÀU SẮC ĐỘNG CHO TAB KHI ĐƯỢC CHỌN ACTIVE --- */
+        .tab-btn.active[data-platform="youtube"] {
+            background: #ff0000;
+            color: white;
+            box-shadow: 0 2px 5px rgba(255, 0, 0, 0.2);
+        }
+
+        .tab-btn.active[data-platform="soundcloud"] {
+            background: #ff5500;
+            color: white;
+            box-shadow: 0 2px 5px rgba(255, 85, 0, 0.2);
+        }
+
+        .tab-btn.active[data-platform="twitter"] {
+            background: #0f1419;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px dashed #ddd;
+        }
+
+        .option-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .option-label input {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* --- KHU VỰC CSS NÚT BẤM CHUẨN THƯƠNG HIỆU --- */
+        button.download-btnyt {
+            width: 100%;
+            padding: 12px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button.download-btnyt:hover {
+            background: #cc0000;
+        }
+        button.download-btnyt:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        button.download-btnsc {
+            width: 100%;
+            padding: 12px;
+            background: #ff5500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button.download-btnsc:hover {
+            background: #e14b00;
+        }
+        button.download-btnsc:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        button.download-btnx {
+            width: 100%;
+            padding: 12px;
+            background: #0f1419;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button.download-btnx:hover {
+            background: #272c30;
+        }
+        button.download-btnx:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status-text {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="tab-container">
+            <button class="tab-btn active" data-platform="youtube" onclick="switchTab('youtube')">🎵 YouTube</button>
+            <button class="tab-btn" data-platform="soundcloud" onclick="switchTab('soundcloud')">☁️ SoundCloud</button>
+            <button class="tab-btn" data-platform="twitter" onclick="switchTab('twitter')">𝕏 Video X</button>
+        </div>
+
+        <div id="youtubeTab" class="tab-content active">
+            <h2>🎵 Tải Nhạc Tối Ưu Từ Youtube</h2>
+            <div class="format-badge" id="ytBadge">⚡ Tự động tối ưu: M4A (AAC) High Quality</div>
+            <input type="text" id="youtubeUrl" placeholder="Dán link video YouTube vào đây...">
+
+            <div class="options-container">
+                <label class="option-label">
+                    <input type="radio" name="ytFormat" value="m4a" checked onchange="updateYoutubeUI()"> M4A
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="ytFormat" value="m4a_old" onchange="updateYoutubeUI()"> M4A (iOS đời cũ)
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="ytFormat" value="mp3" onchange="updateYoutubeUI()"> MP3 320kbps
+                </label>
+            </div>
+
+            <button id="ytBtn" class="download-btnyt" onclick="startDownload('youtube')">Tải Nhạc Chất Lượng Cao</button>
+            <div id="ytStatus" class="status-text"></div>
+        </div>
+
+        <div id="soundcloudTab" class="tab-content">
+            <h2>☁️ Tải Nhạc Gốc Từ SoundCloud</h2>
+            <div class="format-badge" id="scBadge">⚡ Tự động tối ưu: M4A Audio Studio</div>
+            <input type="text" id="soundcloudUrl" placeholder="Dán link bài hát SoundCloud vào đây...">
+
+            <div class="options-container">
+                <label class="option-label">
+                    <input type="radio" name="scFormat" value="m4a" checked onchange="updateSoundCloudUI()"> M4A
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="scFormat" value="m4a_old" onchange="updateSoundCloudUI()"> M4A (iOS đời cũ)
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="scFormat" value="mp3" onchange="updateSoundCloudUI()"> MP3 320kbps
+                </label>
+            </div>
+
+            <button id="scBtn" class="download-btnsc" onclick="startDownload('soundcloud')">Tải Nhạc Studio Gốc</button>
+            <div id="scStatus" class="status-text"></div>
+        </div>
+
+        <div id="twitterTab" class="tab-content">
+            <h2>𝕏 Tải Video Chất Lượng Cao Từ X</h2>
+            <div class="format-badge" id="twBadge">⚡ Tự động tối ưu: Max Quality MP4 Video</div>
+            <input type="text" id="twitterUrl" placeholder="Dán link video X (Twitter) vào đây...">
+            <button id="twBtn" class="download-btnx" onclick="startDownload('twitter')">Tải Video Chất Lượng Cao</button>
+            <div id="twStatus" class="status-text"></div>
+        </div>
+    </div>
+
+    <script>
+        function updateYoutubeUI() {
+            const selectedFormat = document.querySelector('input[name="ytFormat"]:checked').value;
+            const badge = document.getElementById('ytBadge');
+            if (selectedFormat === 'mp3') {
+                badge.innerText = '⚡ Định dạng đầu ra: MP3 320kbps High Quality';
+            } else if (selectedFormat === 'm4a_old') {
+                badge.innerText = '⚡ Tối ưu thiết bị cũ: M4A AAC-LC (Nhẹ & Tương thích 100%)';
+            } else {
+                badge.innerText = '⚡ Tự động tối ưu: M4A (AAC) High Quality';
+            }
+        }
+
+        function updateSoundCloudUI() {
+            const selectedFormat = document.querySelector('input[name="scFormat"]:checked').value;
+            const badge = document.getElementById('scBadge');
+            if (selectedFormat === 'mp3') {
+                badge.innerText = '⚡ Định dạng đầu ra: MP3 320kbps High Quality'; 
+            } else if (selectedFormat === 'm4a_old') {
+                badge.innerText = '⚡ Tối ưu thiết bị cũ: M4A AAC-LC (Nhẹ & Tương thích 100%)';
+            } else {
+                badge.innerText = '⚡ Tự động tối ưu: M4A Audio Studio';
+            }
+        }
+
+        function switchTab(platform) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (platform === 'youtube') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('youtubeTab').classList.add('active');
+            } else if (platform === 'soundcloud') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('soundcloudTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('twitterTab').classList.add('active');
+            }
+        }
+
+        function startDownload(platform) {
+            let urlInput, btn, status, loadingText, successText, selectedFormat = '';
+
+            if (platform === 'youtube') {
+                urlInput = document.getElementById('youtubeUrl').value;
+                btn = document.getElementById('ytBtn');
+                status = document.getElementById('ytStatus');
+                selectedFormat = document.querySelector('input[name="ytFormat"]:checked').value;
+
+                if (selectedFormat === 'mp3') {
+                    loadingText = 'Đang trích xuất sang MP3 320kbps...';
+                    successText = 'Hệ thống đang tải và xử lý convert nhạc sang định dạng MP3, vui lòng chờ...';
+                } else if (selectedFormat === 'm4a_old') {
+                    loadingText = 'Đang tối ưu M4A cho iOS cũ...';
+                    successText = 'Hệ thống đang nén luồng âm thanh AAC-LC tương thích iPhone đời cũ, vui lòng chờ...';
+                } else {
+                    loadingText = 'Đ Đang lấy file M4A gốc từ YouTube...';
+                    successText = 'Hệ thống đang tải và xử lý nhạc trực tiếp từ YouTube, vui lòng đợi trong giây lát...';
+                }
+            } else if (platform === 'soundcloud') {
+                urlInput = document.getElementById('soundcloudUrl').value;
+                btn = document.getElementById('scBtn');
+                status = document.getElementById('scStatus');
+                selectedFormat = document.querySelector('input[name="scFormat"]:checked').value;
+
+                if (selectedFormat === 'mp3') {
+                    loadingText = 'Đang trích xuất sang MP3 320kbps...';
+                    successText = 'Hệ thống đang nén luồng âm thanh SoundCloud sang định dạng MP3, vui lòng chờ...';
+                } else if (selectedFormat === 'm4a_old') {
+                    loadingText = 'Đang tối ưu M4A cho iOS cũ...';
+                    successText = 'Hệ thống đang tối ưu hóa cấu hình âm thanh tương thích hoàn toàn iPhone đời cũ, vui lòng chờ...';
+                } else {
+                    loadingText = 'Đang đóng gói file dạng M4A Studio...';
+                    successText = 'Hệ thống đang bóc tách luồng âm thanh chất lượng cao và chuyển đổi sang M4A, vui lòng đợi...';
+                }
+            } else {
+                urlInput = document.getElementById('twitterUrl').value;
+                btn = document.getElementById('twBtn');
+                status = document.getElementById('twStatus');
+                loadingText = 'Đang bóc tách video từ X...';
+                successText = 'Hệ thống đang tải và xử lý video từ X (Twitter), vui lòng đợi trong giây lát...';
+            }
+
+            if (!urlInput) {
+                if (platform === 'youtube') alert('Vui lòng dán link YouTube!');
+                else if (platform === 'soundcloud') alert('Vui lòng dán link SoundCloud!');
+                else alert('Vui lòng dán link video X/Twitter!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = loadingText;
+            status.style.color = '#666';
+            status.innerText = successText;
+
+            const backendUrl = `/download?url=${encodeURIComponent(urlInput)}&format=${selectedFormat}`;
+            const a = document.createElement('a');
+            a.href = backendUrl;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            const timeoutDuration = (platform === 'twitter') ? 11000 : (selectedFormat === 'mp3' ? 10000 : 8000);
+
+            setTimeout(() => {
+                btn.disabled = false;
+                if (platform === 'youtube') btn.innerText = 'Tải Nhạc Chất Lượng Cao';
+                else if (platform === 'soundcloud') btn.innerText = 'Tải Nhạc Studio Gốc';
+                else btn.innerText = 'Tải Video Chất Lượng Cao';
+                
+                status.style.color = 'green';
+                status.innerText = 'Nếu trình duyệt không tự tải, vui lòng kiểm tra lại link!';
+            }, timeoutDuration);
+        }
+    </script>
+</body>
+
+</html>
+
