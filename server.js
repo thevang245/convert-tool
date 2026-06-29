@@ -2,6 +2,17 @@ const express = require('express');
 const { execFile } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
+
+const isWindows = os.platform() === 'win32';
+
+const ytDlpPath = isWindows
+    ? path.join(__dirname, 'yt-dlp.exe')
+    : 'yt-dlp';
+
+const ffmpegPath = isWindows
+    ? path.join(__dirname, 'ffmpeg.exe')
+    : 'ffmpeg';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,7 +37,7 @@ app.get('/download', (req, res) => {
 
     if (!videoUrl) return res.status(400).send('Thiếu link video/audio!');
 
-    const exePath = path.join(__dirname, 'yt-dlp.exe');
+    const exePath = ytDlpPath;
     console.log(`\n⏳ Đang lấy tiêu đề từ nguồn: ${videoUrl}`);
 
     const isTwitterOrX = videoUrl.includes('twitter.com') || videoUrl.includes('x.com');
@@ -62,7 +73,11 @@ app.get('/download', (req, res) => {
             }
 
             const baseTempName = `temp_${Date.now()}`;
-            const tempFilePathWithNoExt = path.join(__dirname, baseTempName);
+
+            const tempDir = os.tmpdir();
+
+            const tempFilePathWithNoExt =
+                path.join(tempDir, baseTempName);
 
             console.log(`⏳ Đang tiến hành kết nối và tải xuống dữ liệu...`);
 
@@ -84,7 +99,7 @@ app.get('/download', (req, res) => {
                 if (targetFormat === 'mp3') {
                     // LỰA CHỌN: MP3 320kbps
                     downloadArgs.push(
-                        '--ffmpeg-location', __dirname,
+                        '--ffmpeg-location', ffmpegPath,
                         '--extract-audio',
                         '--audio-format', 'mp3',
                         '--audio-quality', '320k'
@@ -92,17 +107,13 @@ app.get('/download', (req, res) => {
                 } else if (targetFormat === 'm4a_old') {
                     // LỰA CHỌN: M4A (iOS đời cũ) - Cần luồng tốt nhất rồi convert sang AAC-LC 192k
                     downloadArgs.push(
-                        '--ffmpeg-location', __dirname,
+                        '--ffmpeg-location', ffmpegPath,
                         '--extract-audio',
                         '--audio-format', 'm4a',
                         '--audio-quality', '192k',
                         '--postprocessor-args', 'ExtractAudio:-c:a aac -profile:a aac_low'
                     );
-                } else {
-                    // LỰA CHỌN: M4A chuẩn - Không thêm tham số bóc tách phức tạp, để yt-dlp lấy thẳng luồng ba[ext=m4a] ở trên
-                    // Chỉ cần khai báo vị trí ffmpeg phòng hờ
-                    downloadArgs.push('--ffmpeg-location', __dirname);
-                }
+                } 
             }
 
             execFile(
@@ -115,7 +126,7 @@ app.get('/download', (req, res) => {
                         return res.status(500).send('Không thể xử lý liên kết này.');
                     }
 
-                    const files = fs.readdirSync(__dirname);
+                    const files = fs.readdirSync(tempDir);
                     const actualTempFile = files.find(f => f.startsWith(baseTempName));
 
                     if (!actualTempFile) {
@@ -124,7 +135,8 @@ app.get('/download', (req, res) => {
                     }
 
                     const actualExtension = path.extname(actualTempFile);
-                    const realTempFilePath = path.join(__dirname, actualTempFile);
+                    const realTempFilePath =
+                        path.join(tempDir, actualTempFile);
 
                     const finalDownloadName = `${cleanTitle}${actualExtension}`;
                     console.log(`✅ Đã xử lý xong file thực tế: ${actualTempFile}. Đang truyền về máy...`);
