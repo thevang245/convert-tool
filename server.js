@@ -93,7 +93,10 @@ app.get('/download', (req, res) => {
 
             // Khởi tạo mảng tham số chạy lệnh
             let downloadArgs = [videoUrl, '-f', activeFormat, '-o', `${tempFilePathWithNoExt}.%(ext)s`];
-
+            downloadArgs.unshift(
+                "--cookies",
+                path.join(__dirname, "cookies.txt")
+            );
             // 2. XỬ LÝ PHÂN NHÁNH ĐỊNH DẠNG THEO YÊU CẦU TỪ FRONTEND
             if (!isTwitterOrX) {
                 if (targetFormat === 'mp3') {
