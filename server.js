@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 function xoaDauTiengViet(str) {
     if (!str) return '';
@@ -144,5 +144,5 @@ app.get('/download', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Hệ thống đã sẵn sàng chạy tại: http://localhost:${PORT}`);
+    console.log(`🚀 Hệ thống đã sẵn sàng chạy tại ${PORT}`);
 });

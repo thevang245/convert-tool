@@ -3,5 +3,8 @@
     "@distube/ytdl-core": "^4.16.12",
     "express": "^5.2.1",
     "tieng-viet-khong-dau": "^1.0.1"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
 }
