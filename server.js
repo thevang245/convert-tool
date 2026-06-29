@@ -113,7 +113,7 @@ app.get('/download', (req, res) => {
                         '--audio-quality', '192k',
                         '--postprocessor-args', 'ExtractAudio:-c:a aac -profile:a aac_low'
                     );
-                } 
+                }
             }
 
             execFile(
@@ -122,8 +122,16 @@ app.get('/download', (req, res) => {
                 { env: { ...process.env, PYTHONIOENCODING: 'utf-8' } },
                 (error, stdout, stderr) => {
                     if (error) {
-                        console.error('❌ Lỗi chạy yt-dlp:', error);
-                        return res.status(500).send('Không thể xử lý liên kết này.');
+                        console.error("========== ERROR ==========");
+                        console.error(error);
+
+                        console.error("========== STDOUT ==========");
+                        console.log(stdout);
+
+                        console.error("========== STDERR ==========");
+                        console.log(stderr);
+
+                        return res.status(500).send(stderr || error.message);
                     }
 
                     const files = fs.readdirSync(tempDir);
